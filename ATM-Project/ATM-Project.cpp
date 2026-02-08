@@ -67,8 +67,8 @@ vector<string>SplitString(string Text ,string Delim) {
 	}
 	return vWord;
 }
-stClients ConvertLineToRecord(string line,string sperator="#//#") {
-	vector <string>vWord=SplitString(line,sperator);
+stClients ConvertLineToRecord(string line, string sperator = "#//#") {
+	vector <string>vWord = SplitString(line, sperator);
 	stClients client;
 	client.AccountNumber = vWord.at(0);
 	client.PinCode = vWord.at(1);
@@ -92,7 +92,7 @@ vector<stClients> LoadClientDataFromFile(string File) {
 	}
 	return vClients;
 }
-bool FindClientByAccountNumberAndPinCode(string AccountNumber,string PinCode,stClients & client) {
+bool FindClientByAccountNumberAndPinCode(string AccountNumber, string PinCode, stClients& client) {
 	vector<stClients>vClient = LoadClientDataFromFile(ClientList);
 	for (stClients& clt : vClient) {
 		if (clt.AccountNumber == AccountNumber && clt.PinCode == PinCode) {
@@ -104,32 +104,35 @@ bool FindClientByAccountNumberAndPinCode(string AccountNumber,string PinCode,stC
 }
 bool IsClientExist(string Account, string PinCode) {
 
-	if (FindClientByAccountNumberAndPinCode(Account, PinCode,CurrentClient)) {
+	if (FindClientByAccountNumberAndPinCode(Account, PinCode, CurrentClient)) {
 		return true;
 	}
 	else {
 		return false;
 	}
 }
-short ReadMenuOptions(string message)
+short ReadMenuOptions(string message,short from,short To)
 {
-	short Read;
-	cout << message;
-	cin >> Read;
+	short Read; 
+	do {
+		cout << message;
+		cin >> Read;
+	} while (Read<from || Read>To);
 	return Read;
 }
+
 void GoBackToQuickWithDrawMenu() {
-	cout << "Press any key to continue...";
+	cout << "\nPress any key to continue...";
 	system("pause>0");
 	QuickwithDrawMenu();
 }
 void GoBackToAtmMainMenu() {
-	cout << "Press Any Key To Go Back to ATM Menu...";
+	cout << "\nPress Any Key To Go Back to ATM Menu...";
 	system("pause>0");
 	AtmMainMenuScreen();
 }
-string ConvertRecordToLine(stClients &client,string Sperator="#//#") {
-	string line="";
+string ConvertRecordToLine(stClients& client, string Sperator = "#//#") {
+	string line = "";
 	line += client.AccountNumber + Sperator;
 	line += client.PinCode + Sperator;
 	line += client.Name + Sperator;
@@ -137,41 +140,81 @@ string ConvertRecordToLine(stClients &client,string Sperator="#//#") {
 	line += to_string(client.AccountBalance);
 	return line;
 }
-void SaveDataInFileAgain(stClients &client,string File) {
+void SaveDataInFileAgain(vector<stClients>&vclient, string File) {
 	fstream Myfile;
-	Myfile.open(File, ios::out | ios::app);
+	Myfile.open(File, ios::out);
 	if (Myfile.is_open()) {
 		string Line;
-		Line = ConvertRecordToLine(client);
-		Myfile << Line << endl;
+		for (stClients& clt : vclient) {
+			Line = ConvertRecordToLine(clt);
+			Myfile << Line << endl;
+		}
 		Myfile.close();
 	}
+}
+
+int ReadAmountMultiple5() {
+	int amount;
+	cout << "\nEnter An Amount Multiple of 5's? ";
+	cin >> amount;
+	while (true) {
+		if ((amount % 5 == 0) && amount > 0) {
+			return amount;
+		}
+		cout << "\nEnter An Amount Multiple of 5's? ";
+		cin >> amount;
+	}
+	return 0;
+	
+}
+
+int ReadPositiveAmount() {
+	int amount;
+	cout << "\nEnter a Positive Amount?  ";
+	cin >> amount;
+	while (amount < 0) {
+		cout << "\nEnter a Positive Amount?";
+		cin >> amount;
+	}
+	return amount;
 }
 
 //QuickwithDraw :
 
 
-void QuickWithDrawFromAccount(int Amount,stClients &Client) {
+void QuickWithDrawFromAccount(int Amount, stClients &client) {
 	char Confirm = 'y';
-	if (Client.AccountBalance > Amount) {
-		cout << "Are you sure you want to perform this Transaction? Y/N ";
-		cin >> Confirm;
-		if (toupper(Confirm) == 'Y') {
-			Client.AccountBalance -= Amount;
-			cout << "\nDone Successfully , New Balance is " << to_string(Client.AccountBalance) << endl;
-			SaveDataInFileAgain(Client, ClientList);
-		}
-		else {
-			GoBackToAtmMainMenu();
-		}
+	vector<stClients>vClient = LoadClientDataFromFile(ClientList);
+	for (stClients& clt : vClient) {
+		if (clt.AccountNumber == client.AccountNumber) 
+		{
+			if (clt.AccountBalance > Amount)
+			{
+				cout << "\nAre you sure you want to perform this Transaction? Y/N ";
+				cin >> Confirm;
+				if (toupper(Confirm) == 'Y') 
+				{
+					clt.AccountBalance -= Amount;
+					cout << "\nDone Successfully , New Balance is " << to_string(clt.AccountBalance) << endl;
+					client = clt;
+					SaveDataInFileAgain(vClient, ClientList);
+					vClient = LoadClientDataFromFile(ClientList);
+			    }
+			
+			
+		     }
+		     else 
+			{
+			cout << "\nThe Amount Exceeds Your Balance Make another choice.\n";
+			GoBackToQuickWithDrawMenu();
+		    }
+			
+	   }
+	
+		
 	}
-	else {
-		cout << "The Amount Exceeds Your Balance Make another choice.\n";
-		GoBackToQuickWithDrawMenu();
-	}
+	
 }
-
-
 void PerformQuickWithDrawMenuOption(enQuickWithDrawAmount Amount) {
 	switch (Amount) {
 	case enQuickWithDrawAmount::One:
@@ -211,12 +254,10 @@ void PerformQuickWithDrawMenuOption(enQuickWithDrawAmount Amount) {
 		break;
 	}
 }
-
-
 void QuickwithDrawMenu() {
 	system("cls");
 	cout << "========================================================\n\n";
-	cout << "\t   Quick WithDraw menu Screen\n\n";
+	cout << "\t   Quick WithDraw Screen \n\n";
 	cout << "========================================================\n\n";
 	cout << setw(15)<< "[1] " << "$20" <<	setw(11)<<"[2] " <<"$50"<<endl;
 	cout << setw(15)<< "[3] " << "$100"<<	setw(10)<<"[4] " <<"$200"<<endl;
@@ -225,22 +266,70 @@ void QuickwithDrawMenu() {
 	cout << setw(15)<< "[9] " << "Exit\n";
 	cout << "\n========================================================\n";
 	cout << "Your Balance is : " << to_string(CurrentClient.AccountBalance) << endl;
-	PerformQuickWithDrawMenuOption((enQuickWithDrawAmount)ReadMenuOptions("Choose What to Withdraw From [1] to [8] "));
+	PerformQuickWithDrawMenuOption((enQuickWithDrawAmount)ReadMenuOptions("Choose What to Withdraw From [1] to [8] ",1,9));
+}
+
+
+//Noraml withDraw :
+
+void NormalWithdrawScreen() {
+	system("cls");
+	cout << "========================================================\n\n";
+	cout << "\t   Normal WithDraw Screen\n\n";
+	cout << "========================================================\n\n";
+	QuickWithDrawFromAccount(ReadAmountMultiple5(), CurrentClient);
 }
 
 
 
+//Deposit menu :
 
 
+void DepositAmountToAccount(int Amount, stClients& client) {
+	char Confirm = 'y';
+	vector<stClients>vClient = LoadClientDataFromFile(ClientList);
+	for (stClients& clt : vClient) {
+		if (clt.AccountNumber == client.AccountNumber)
+		{
+			if (Amount > 0)
+			{
+				cout << "\nAre you sure you want to perform this Transaction? Y/N ";
+				cin >> Confirm;
+				if (toupper(Confirm) == 'Y')
+				{
+					clt.AccountBalance += Amount;
+					cout << "\nDone Successfully , New Balance is " << to_string(clt.AccountBalance) << endl;
+					client = clt;
+					SaveDataInFileAgain(vClient, ClientList);
+					vClient = LoadClientDataFromFile(ClientList);
+				}
+
+			}
+		}
 
 
+	}
+}
+
+void DepositScreen() {
+	system("cls");
+	cout << "========================================================\n\n";
+	cout << "\t   Deposit  Screen\n\n";
+	cout << "========================================================\n\n";
+	DepositAmountToAccount(ReadPositiveAmount(),CurrentClient);
+}
+
+//Show Balance menu :
 
 
-
-
-
-
-
+void CheckBalanceScreen() {
+	system("cls");
+	cout << "========================================================\n\n";
+	cout << "\t   Check Balance Screen\n\n";
+	cout << "========================================================\n\n";
+	cout << "\t\tBalance : " << CurrentClient.AccountBalance << endl<<endl;
+	GoBackToAtmMainMenu();
+}
 
 
 
@@ -252,13 +341,15 @@ void PerformMainMenuOption(enAtmMenuOption ReadOption) {
 		QuickwithDrawMenu();
 		break;
 	case enAtmMenuOption::eNormalWithdraw:
-
+		NormalWithdrawScreen();
+		GoBackToAtmMainMenu();
 		break;
 	case enAtmMenuOption::eDeposit:
-
+		DepositScreen();
+		GoBackToAtmMainMenu();
 		break;
 	case enAtmMenuOption::eSeeBalance:
-
+		CheckBalanceScreen();
 		break;
 
 	case enAtmMenuOption::eExtit:
@@ -270,7 +361,7 @@ void AtmMainMenuScreen() {
 	system("cls");
 	cout << "========================================================\n";
 	cout << "Date : " << GetLocalDate().Day << "/" << GetLocalDate().Month 
-		<< "/" << GetLocalDate().Year << "." <<" / Account N : "<<CurrentClient.AccountNumber << endl;
+		<< "/" << GetLocalDate().Year << "." <<" / Account N : "<<CurrentClient.AccountNumber <<" / Balance : "<<CurrentClient.AccountBalance<< endl;
 	cout << "========================================================\n\n";
 	cout << "\t\tATM Main menu Screen\n\n";
 	cout << "========================================================\n\n";
@@ -280,7 +371,7 @@ void AtmMainMenuScreen() {
 	cout << setw(15) << "[4] " << "Check Balance." << endl;
 	cout << setw(15) << "[5] " << "Logout." << endl;
 	cout << "\n========================================================\n";
-	PerformMainMenuOption((enAtmMenuOption)ReadMenuOptions("Please Chosse what You want to do [1 to 5]"));
+	PerformMainMenuOption((enAtmMenuOption)ReadMenuOptions("Please Chosse what You want to do [1 to 5] ",1,5));
 }
 
 
