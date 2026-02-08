@@ -325,9 +325,9 @@ void DepositScreen() {
 void CheckBalanceScreen() {
 	system("cls");
 	cout << "========================================================\n\n";
-	cout << "\t   Check Balance Screen\n\n";
+	cout << "\t\tCheck Balance Screen\n\n";
 	cout << "========================================================\n\n";
-	cout << "\t\tBalance : " << CurrentClient.AccountBalance << endl<<endl;
+	cout << "\t\t  Balance : " << CurrentClient.AccountBalance << endl<<endl;
 	GoBackToAtmMainMenu();
 }
 
@@ -361,7 +361,7 @@ void AtmMainMenuScreen() {
 	system("cls");
 	cout << "========================================================\n";
 	cout << "Date : " << GetLocalDate().Day << "/" << GetLocalDate().Month 
-		<< "/" << GetLocalDate().Year << "." <<" / Account N : "<<CurrentClient.AccountNumber <<" / Balance : "<<CurrentClient.AccountBalance<< endl;
+		<< "/" << GetLocalDate().Year << "." <<" / Account N : "<<CurrentClient.AccountNumber << endl;
 	cout << "========================================================\n\n";
 	cout << "\t\tATM Main menu Screen\n\n";
 	cout << "========================================================\n\n";
@@ -373,6 +373,8 @@ void AtmMainMenuScreen() {
 	cout << "\n========================================================\n";
 	PerformMainMenuOption((enAtmMenuOption)ReadMenuOptions("Please Chosse what You want to do [1 to 5] ",1,5));
 }
+
+
 
 
 
