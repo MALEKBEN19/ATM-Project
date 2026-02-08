@@ -1,3 +1,19 @@
 .vs/
 *.txt
 *.vcxproj.user
+x64/
+# Visual Studio build folders
+x64/
+Debug/
+Release/
+
+# VS temp & debug files
+*.obj
+*.ilk
+*.pdb
+*.idb
+*.tlog
+*.exe
+
+# VS user files
+.vs/

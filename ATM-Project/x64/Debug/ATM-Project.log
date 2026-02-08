@@ -1,3 +1,0 @@
-﻿  ATM-Project.cpp
-D:\Programming_Path\level 8\Projects\Project 2\ATM-Project\ATM-Project\ATM-Project.cpp(58,27): warning C4267: '=': conversion from 'size_t' to 'short', possible loss of data
-  ATM-Project.vcxproj -> D:\Programming_Path\level 8\Projects\Project 2\ATM-Project\x64\Debug\ATM-Project.exe
